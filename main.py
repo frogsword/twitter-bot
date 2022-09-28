@@ -20,8 +20,7 @@ def get_random_word_and_definition():
         response = requests.get(url=f"https://api.dictionaryapi.dev/api/v2/entries/en/{random_word}")
         response.raise_for_status()
         json = response.json()
-        meanings = json[0]['meanings']
-        definition = meanings[0]['definitions'][0]['definition']
+        definition = json[0]['meanings'][0]['definitions'][0]['definition']
 
     except requests.exceptions.HTTPError or NameError:
         random_word = random.choice(word)
@@ -46,6 +45,9 @@ class TwitterBot:
 
         # enter phone number
         self.driver.implicitly_wait(5)
+        self.phone_input = bot.driver.find_element(By.XPATH, '//input[@autocomplete="on"]')
+        self.phone_input.send_keys(creds.PHONE_NUMBER)
+        self.phone_input.send_keys(Keys.ENTER)
 
         # password
         self.driver.implicitly_wait(5)
@@ -55,11 +57,16 @@ class TwitterBot:
 
         # sending tweet
         self.driver.implicitly_wait(5)
-        self.tweet_input = bot.driver.find_element(By.XPATH, '//div[contains(@aria-label, "Tweet text"])')
+        self.driver.find_element(By.CSS_SELECTOR, 'a[aria-label="Tweet"]').click()
+        self.tweet_input = self.driver.find_element(By.CSS_SELECTOR, 'div[data-contents="true"]')
         self.tweet_input.send_keys(tweet)
-        self.tweet_input.send_keys(Keys.ENTER)
+        self.driver.find_element(By.CSS_SELECTOR, 'div[data-testid="tweetButton"]').click()
+        self.driver.quit()
 
 
-get_random_word_and_definition()
-bot = TwitterBot(PATH)
-bot.tweet_word()
+while True:
+    # every 24 hours
+    get_random_word_and_definition()
+    bot = TwitterBot(PATH)
+    bot.tweet_word()
+    time.sleep(86400)
