@@ -31,7 +31,11 @@ def get_random_word_and_definition():
 
 
 class TwitterBot:
-    def __init__(self, driver):
+    def __init__(self):
+        self.tweet_input = None
+        self.pass_input = None
+        self.phone_input = None
+        self.email_input = None
         self.driver = webdriver.Chrome(executable_path=creds.DRIVER_PATH)
 
     def tweet_word(self):
@@ -67,6 +71,6 @@ class TwitterBot:
 while True:
     # every 24 hours
     get_random_word_and_definition()
-    bot = TwitterBot(PATH)
+    bot = TwitterBot()
     bot.tweet_word()
     time.sleep(86400)
